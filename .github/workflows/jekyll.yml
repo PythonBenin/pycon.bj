@@ -1,4 +1,4 @@
-name: Ruby CI
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -17,9 +17,19 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.0' # Not needed with a .ruby-version file
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-      - run: bundle exec rake
+          ruby-version: '3.0'
+          bundler-cache: true
 
-      - name: Run tests
-        run: bundle exec rspec
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install
+
+      - name: Build Jekyll site
+        run: bundle exec jekyll build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
